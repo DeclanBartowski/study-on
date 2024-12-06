@@ -1,3 +1,9 @@
+parameters:
+    # Adds a fallback DATABASE_URL if the env var is not set.
+    # This allows you to run cache:warmup even if your
+    # environment variables are not available yet.
+    # You should not need to change this value.
+    env(DATABASE_URL): ''
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
@@ -8,6 +14,8 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+        driver: 'pdo_pgsql'
+        server_version: '11'
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
