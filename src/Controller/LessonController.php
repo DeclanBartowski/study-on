@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Course;
 use App\Entity\Lesson;
 use App\Form\LessonType;
 use App\Repository\LessonRepository;
@@ -27,6 +28,9 @@ final class LessonController extends AbstractController
     {
         $lesson = new Lesson();
         $form = $this->createForm(LessonType::class, $lesson);
+        if ($courseId = $request->get('course_id')) {
+            $form->get('course')->setData($entityManager->getRepository(Course::class)->find($courseId));
+        }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

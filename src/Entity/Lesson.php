@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\LessonRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LessonRepository::class)]
 class Lesson
@@ -24,6 +25,12 @@ class Lesson
     private ?string $content = null;
 
     #[ORM\Column(type: "smallint")]
+    #[Assert\Range(options: [
+        'min' => 0,
+        'max' => 10000
+    ], notInRangeMessage: 'The value must be between {{ min }} and {{ max }}.')]
+    #[Assert\Type(type: 'integer')]
+    #[Assert\NotBlank]
     private ?int $orderNumber = null;
 
     public function getId(): ?int

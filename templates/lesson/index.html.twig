@@ -1,39 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Lesson index{% endblock %}
+{% block title %}Уроки{% endblock %}
 
 {% block body %}
-    <h1>Lesson index</h1>
+    <h1>Уроки</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Content</th>
-                <th>OrderNumber</th>
-                <th>actions</th>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
         {% for lesson in lessons %}
             <tr>
-                <td>{{ lesson.id }}</td>
                 <td>{{ lesson.name }}</td>
-                <td>{{ lesson.content }}</td>
-                <td>{{ lesson.orderNumber }}</td>
+                <td>{{ lesson.content ?: '' }}</td>
                 <td>
-                    <a href="{{ path('app_lesson_show', {'id': lesson.id}) }}">show</a>
-                    <a href="{{ path('app_lesson_edit', {'id': lesson.id}) }}">edit</a>
+                    <a href="{{ path('app_lesson_show', {'id': lesson.id}) }}">Показать</a>
+                    <a href="{{ path('app_lesson_edit', {'id': lesson.id}) }}">Изменить</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="5">На данный момент уроков нет</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_lesson_new') }}">Create new</a>
+    <a href="{{ path('app_lesson_new') }}">Добавить урок</a>
 {% endblock %}
