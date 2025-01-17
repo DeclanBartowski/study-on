@@ -25,9 +25,15 @@ class LessonType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class)
-            ->add('content', TextareaType::class)
-            ->add('orderNumber', IntegerType::class)
+            ->add('name', TextType::class, [
+                'label' => 'Название урока',
+            ])
+            ->add('content', TextareaType::class, [
+                'label' => 'Описание урока',
+            ])
+            ->add('orderNumber', IntegerType::class, [
+                'label' => 'Порядковый номер',
+            ])
             ->add('course', HiddenType::class);
 
         $builder->get('course')->addModelTransformer(new CourseToIdTransformer($this->entityManager));

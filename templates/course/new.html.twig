@@ -3,9 +3,11 @@
 {% block title %}Добавить новый курс{% endblock %}
 
 {% block body %}
-    <h1>Добавить новый курс</h1>
+    <div class="container">
+        <h1>Добавить новый курс</h1>
 
-    {{ include('course/_form.html.twig') }}
-
-    <a href="{{ path('app_course_index') }}">вернуться к списку</a>
+        {{ include('course/_form.html.twig') }}
+        <hr class="my-4">
+        <a class="btn btn-secondary" href="{{ path('app_course_index') }}">вернуться к списку</a>
+    </div>
 {% endblock %}

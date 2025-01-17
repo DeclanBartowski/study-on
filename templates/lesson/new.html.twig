@@ -3,8 +3,11 @@
 {% block title %}Новый урок{% endblock %}
 
 {% block body %}
-    <h1>Создать новый урок</h1>
+    <div class="container">
+        <h1>Создать новый урок</h1>
 
-    {{ include('lesson/_form.html.twig') }}
-    <a href="{{ path('app_lesson_index') }}">Вернуться к списку</a>
+        {{ include('lesson/_form.html.twig') }}
+        <hr class="my-4">
+        <a class="btn btn-secondary" href="{{ path('app_lesson_index') }}">Вернуться к списку</a>
+    </div>
 {% endblock %}

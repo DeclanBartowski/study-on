@@ -3,23 +3,33 @@
 {% block title %}Курсы{% endblock %}
 
 {% block body %}
-    <h1>Курсы</h1>
+    <div class="container">
+        <h1 class="h1">Курсы</h1>
 
-    <table class="table">
-        <tbody>
-        {% for course in courses %}
-            <tr>
-                <td>
-                    <a href="{{ path('app_course_show', {'id': course.id}) }}">{{ course.name }}</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <br>
-    <a href="{{ path('app_course_new') }}">Добавить новый курс</a>
+        <div class="album py-5">
+            <div class="container">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    {% for course in courses %}
+                        <div class="col">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <a href="{{ path('app_course_show', {'id': course.id}) }}"
+                                       class="h3">{{ course.name }}</a>
+                                    <p class="card-text">
+                                        {% if course.description|length > 120 %}
+                                            {{ course.description|slice(0, 120) }}...
+                                        {% else %}
+                                            {{ course.description }}
+                                        {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>На данный момент курсов нет (</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <a class="btn btn-primary" href="{{ path('app_course_new') }}">Добавить новый курс</a>
+    </div>
 {% endblock %}
