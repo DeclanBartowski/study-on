@@ -19,16 +19,24 @@ class Lesson
     private ?Course $course = null;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: 'Название урока не может быть пустым.')]
+    #[Assert\Length(
+        min: 3,
+        max: 50,
+        minMessage: 'Название урока должно содержать минимум {{ limit }} символа.',
+        maxMessage: 'Название урока не может быть длиннее {{ limit }} символов.'
+    )]
     private ?string $name = null;
 
     #[ORM\Column(type: "text")]
+    #[Assert\NotBlank(message: 'Описание урока не может быть пустым.')]
     private ?string $content = null;
 
     #[ORM\Column(type: "smallint")]
     #[Assert\Range(options: [
         'min' => 0,
         'max' => 10000
-    ], notInRangeMessage: 'The value must be between {{ min }} and {{ max }}.')]
+    ], notInRangeMessage: 'Значение должно быть между {{ min }} и {{ max }}.')]
     #[Assert\Type(type: 'integer')]
     #[Assert\NotBlank]
     private ?int $orderNumber = null;

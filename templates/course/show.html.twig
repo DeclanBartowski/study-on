@@ -12,7 +12,8 @@
             <ul class="list-unstyled ps-0">
                 {% for key, lesson in lessons %}
                     <li>
-                        <a class="icon-link mb-1" href="{{ path('app_lesson_show', {'id': lesson.id}) }}" target="_blank">
+                        <a class="icon-link mb-1 course-lesson" href="{{ path('app_lesson_show', {'id': lesson.id}) }}"
+                           target="_blank">
                             {{ key+1 }}. {{ lesson.name }}
                         </a>
                     </li>
@@ -27,7 +28,7 @@
 
             <a href="{{ path('app_course_edit', {'id': course.id}) }}" class="btn btn-outline-secondary">Редактировать
                 курс</a>
-            <a href="{{ path('app_lesson_new') }}/?course_id={{ course.id }}" class="btn btn-outline-secondary">Добавить
+            <a href="{{ path('app_lesson_new') }}?course_id={{ course.id }}" class="btn btn-outline-secondary">Добавить
                 урок</a>
 
             {{ include('course/_delete_form.html.twig') }}

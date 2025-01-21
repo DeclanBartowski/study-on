@@ -3,9 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\CourseRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
 class Course
@@ -19,12 +20,19 @@ class Course
     private ?string $symbolCode;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: 'Название урока не может быть пустым.')]
+    #[Assert\Length(
+        min: 3,
+        max: 20,
+        minMessage: 'Название курса должно содержать минимум {{ limit }} символа.',
+        maxMessage: 'Название курса не может быть длиннее {{ limit }} символов.'
+    )]
     private ?string $name;
 
     #[ORM\Column(type: "text", length: 1000)]
     private ?string $description = null;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\Lesson", mappedBy: "course")]
+    #[ORM\OneToMany(targetEntity: "App\Entity\Lesson", mappedBy: "course", cascade: ['remove'])]
     #[ORM\OrderBy(['orderNumber' => 'ASC'])]
     private Collection $lessons;
 

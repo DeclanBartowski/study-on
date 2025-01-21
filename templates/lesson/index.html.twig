@@ -3,33 +3,33 @@
 {% block title %}Уроки{% endblock %}
 
 {% block body %}
-    <h1>Уроки</h1>
+    <div class="container">
+        <h1 class="h1">Уроки</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Название</th>
-                <th>Описание</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for lesson in lessons %}
-            <tr>
-                <td>{{ lesson.name }}</td>
-                <td>{{ lesson.content ?: '' }}</td>
-                <td>
-                    <a href="{{ path('app_lesson_show', {'id': lesson.id}) }}">Показать</a>
-                    <a href="{{ path('app_lesson_edit', {'id': lesson.id}) }}">Изменить</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">На данный момент уроков нет</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_lesson_new') }}">Добавить урок</a>
+        <div class="album py-5">
+            <div class="container">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    {% for lesson in lessons %}
+                        <div class="col lesson-card">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <a href="{{ path('app_lesson_show', {'id': lesson.id}) }}"
+                                       class="h3">{{ lesson.name }}</a>
+                                    <p class="card-text">
+                                        {% if lesson.content|length > 120 %}
+                                            {{ lesson.content|slice(0, 120) }}...
+                                        {% else %}
+                                            {{ lesson.content }}
+                                        {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>На данный момент уроков нет (</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <a class="btn btn-primary" href="{{ path('app_lesson_new') }}">Добавить новый урок</a>
+    </div>
 {% endblock %}
