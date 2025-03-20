@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <form method="post">
+
+            <h1 class="h3 mb-3 font-weight-normal">Регистрация</h1>
+
+            {% for flashError in app.flashes('error') %}
+                <div class="alert alert-danger">{{ flashError }}</div>
+            {% endfor %}
+
+            {{ form_start(registrationForm) }}
+            {{ form_row(registrationForm.email) }}
+            {{ form_row(registrationForm.password) }}
+
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+            {{ form_end(registrationForm) }}
+
+
+        </form>
+    </div>
+{% endblock %}

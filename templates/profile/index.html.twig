@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="h1">Профиль</h1>
+
+        <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+            <div class="px-0">
+                <p class="display-4 h2">E-mail</p>
+                <p class="lead my-3">{{ user.username ?: ''}}</p>
+            </div>
+        </div>
+        <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+            <div class="px-0">
+                <p class="display-4 h2">Роль</p>
+                <p class="lead my-3">{{ user.main_role ?: ''}}</p>
+            </div>
+        </div>
+        <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+            <div class="px-0">
+                <p class="display-4 h2">Баланс</p>
+                <p class="lead my-3">{{ user.balance ?: 0}}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

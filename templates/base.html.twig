@@ -15,8 +15,15 @@
     </head>
     <body>
         <div class="container">
-            <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <header class="d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
                 <span class="fs-4">Study On</span>
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <a href="{{ path('app_profile') }}">Профиль</a>
+                    <a href="{{ path('app_logout') }}">Выйти</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}">Вход</a>
+                    <a href="{{ path('app_register') }}">Регистрация</a>
+                {% endif %}
             </header>
         </div>
         {% block body %}{% endblock %}

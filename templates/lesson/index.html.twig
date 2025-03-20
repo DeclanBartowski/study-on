@@ -30,6 +30,8 @@
                 </div>
             </div>
         </div>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
         <a class="btn btn-primary" href="{{ path('app_lesson_new') }}">Добавить новый урок</a>
+        {% endif %}
     </div>
 {% endblock %}
