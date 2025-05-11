@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}История транзакций{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="h1">История транзакций</h1>
+
+        {% for transaction in transactions %}
+            <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+                <div class="px-0">
+                    <p class="lead my-3">{{ transaction.name}}</p>
+                    {% if transaction.course_id ?? false %}
+                        <a class="lead my-3" href="{{ path('app_course_show', {'id': transaction.course_id}) }}">{{ transaction.course_name }}</a>
+                    {% endif %}
+                    <p class="lead my-3">{{ transaction.amount}}</p>
+                    <p class="lead my-3">{{ transaction.created_at|date('d.m.Y') }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

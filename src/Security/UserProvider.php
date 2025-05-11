@@ -2,7 +2,8 @@
 
 namespace App\Security;
 
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\BillingClient;
+use App\Service\TokenService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -15,8 +16,11 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
 
-    public function __construct(private EntityManagerInterface $entityManager, private RequestStack $request)
-    {
+    public function __construct(
+        private RequestStack $request,
+        private TokenService $tokenService,
+        private BillingClient $billingClient
+    ) {
     }
 
     /**
@@ -69,6 +73,18 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
     {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', $user::class));
+        }
+
+        if ($this->tokenService->isTokenExpired($user->getApiToken())) {
+            $response = $this->billingClient->post('/api/v1/token/refresh', [
+                'refresh_token' => $user->getRefreshToken(),
+            ]);
+            if (!$response['refresh_token'] || !$response['token']) {
+                throw new UnsupportedUserException('Ошибка при получении токена пользователя');
+            }
+            $user->setApiToken($response['token']);
+            $user->setRefreshToken($response['refresh_token']);
+            return $user;
         }
 
         return $this->loadUserByIdentifier($user->getEmail());

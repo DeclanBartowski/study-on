@@ -13,14 +13,28 @@
                         <div class="col course-card">
                             <div class="card shadow-sm">
                                 <div class="card-body">
-                                    <a href="{{ path('app_course_show', {'id': course.id}) }}"
-                                       class="h3">{{ course.name }}</a>
+                                    <a href="{{ path('app_course_show', {'id': course.entity.id}) }}"
+                                       class="h3">{{ course.entity.name }}</a>
                                     <p class="card-text">
-                                        {% if course.description|length > 120 %}
-                                            {{ course.description|slice(0, 120) }}...
+                                        {% if course.entity.description|length > 120 %}
+                                            {{ course.entity.description|slice(0, 120) }}...
                                         {% else %}
-                                            {{ course.description }}
+                                            {{ course.entity.description }}
                                         {% endif %}
+                                    </p>
+                                    <p class="card-text">
+                                        {% if course.data.type == 3 %}
+                                            Бесплатный
+                                        {% elseif app.user %}
+                                            {% if course.data.course_bought ?? false %}
+                                                Куплен
+                                            {% elseif course.data.course_expired ?? false %}
+                                                Арендовано до {{ course.data.course_expired }}
+                                            {% else %}
+                                                {{ course.data.price }}
+                                            {% endif %}
+                                        {% endif %}
+                                    </p>
                                 </div>
                             </div>
                         </div>

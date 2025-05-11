@@ -2,28 +2,20 @@
 
 namespace App\Controller;
 
+use App\Service\UserBillingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Service\BillingClient;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ProfileController extends AbstractController
 {
     #[Route('/profile', name: 'app_profile')]
-    public function index(Request $request, BillingClient $billingClient): Response
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function index(Request $request, UserBillingService $userBillingService): Response
     {
-        $user = $request->getSession()->get('user');
-        $error = '';
-
-        if (!$user->getApiToken()) {
-            $error = 'Вы не авторизованы';
-        }
-
-        $billingClient->setHeaders([
-            'Authorization: Bearer ' . $user->getApiToken()
-        ]);
-        $userInfo = $billingClient->get('/api/v1/users/current');
+        $userInfo = $userBillingService->getUserInfo($this->getUser());
 
         $userInfo['main_role'] = 'Пользователь';
         if (in_array('ROLE_SUPER_ADMIN', $userInfo['roles'])) {
@@ -32,7 +24,6 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/index.html.twig', [
             'user' => $userInfo,
-            'error' => $error,
         ]);
     }
 }

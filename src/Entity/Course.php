@@ -11,6 +11,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
 class Course
 {
+    public const TYPE_FULL = 1;
+    public const TYPE_RENT = 2;
+    public const TYPE_FREE = 3;
+
+    public const RENT_TYPE_TIME = '1 week';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

@@ -10,6 +10,8 @@ class User implements UserInterface
 
     private ?string $apiToken;
 
+    private ?string $refreshToken;
+
     private ?string $password;
 
     private array $roles = [];
@@ -36,11 +38,6 @@ class User implements UserInterface
         $this->email = $email;
 
         return $this;
-    }
-
-    public function getSalt(): ?string
-    {
-        return null; // Соль не используется
     }
 
     /**
@@ -100,5 +97,21 @@ class User implements UserInterface
     public function setPassword(?string $password): void
     {
         $this->password = $password;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRefreshToken(): ?string
+    {
+        return $this->refreshToken;
+    }
+
+    /**
+     * @param string|null $refreshToken
+     */
+    public function setRefreshToken(?string $refreshToken): void
+    {
+        $this->refreshToken = $refreshToken;
     }
 }

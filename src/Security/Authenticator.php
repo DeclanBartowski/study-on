@@ -61,12 +61,6 @@ class Authenticator extends AbstractLoginFormAuthenticator
         return $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
     }
 
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        // Проверка пароля будет выполнена в API
-        return true;
-    }
-
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
         if (!$token->getUser()) {
@@ -99,6 +93,7 @@ class Authenticator extends AbstractLoginFormAuthenticator
             $apiToken = $response['token'];
             $user = new User();
             $user->setApiToken($apiToken);
+            $user->setRefreshToken($response['refresh_token']);
             $user->setRoles($response['user']['roles']);
             $user->setEmail($email);
 

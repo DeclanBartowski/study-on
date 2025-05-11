@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Course;
 use App\Entity\Lesson;
+use App\Exception\AccessDeniedException;
 use App\Form\LessonType;
 use App\Repository\LessonRepository;
+use App\Service\TransactionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,8 +52,21 @@ final class LessonController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_lesson_show', methods: ['GET'])]
-    public function show(Lesson $lesson): Response
-    {
+    public function show(
+        Lesson $lesson,
+        TransactionService $transactionService
+    ): Response {
+        if ($user = $this->getUser()) {
+            $transactions = $transactionService->getUserTransactions($user);
+            $coursePay = $transactionService->isCoursePay($lesson->getCourse());
+            if ($coursePay) {
+                $courseBuyed = $transactionService->isCourseBuyed($lesson->getCourse(), $transactions);
+                if (!$courseBuyed) {
+                    throw new AccessDeniedException();
+                }
+            }
+        }
+
         return $this->render('lesson/show.html.twig', [
             'lesson' => $lesson,
             'course' => $lesson->getCourse(),

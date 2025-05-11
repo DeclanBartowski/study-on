@@ -5,21 +5,44 @@ namespace App\Controller;
 use App\Entity\Course;
 use App\Form\CourseType;
 use App\Repository\CourseRepository;
+use App\Service\BillingClient;
+use App\Service\CourseService;
+use App\Service\TransactionService;
+use App\Service\UserBillingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 #[Route('/courses')]
 final class CourseController extends AbstractController
 {
     #[Route(name: 'app_course_index', methods: ['GET'])]
-    public function index(CourseRepository $courseRepository): Response
-    {
+    public function index(
+        CourseRepository $courseRepository,
+        BillingClient $billingClient,
+        CourseService $courseService,
+        UserBillingService $userBillingService,
+        TransactionService $transactionService
+    ): Response {
+        $courses = $courseRepository->findAll();
+        $coursesBilling = $billingClient->post('/api/v1/courses');
+        $mergedCourses = $courseService->mergeCourses($coursesBilling, $courses);
+
+        $userInfo = [];
+        if ($user = $this->getUser()) {
+            $transactions = $transactionService->getUserTransactions($user);
+            $mergedCourses = $courseService->mergeCoursesWithTransactions($mergedCourses, $transactions);
+
+            $userInfo = $userBillingService->getUserInfo($user);
+        }
+
         return $this->render('course/index.html.twig', [
-            'courses' => $courseRepository->findAll(),
+            'courses' => $mergedCourses,
+            'user_info' => $userInfo,
         ]);
     }
 
@@ -45,11 +68,18 @@ final class CourseController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_course_show', methods: ['GET'])]
-    public function show(Course $course): Response
-    {
+    public function show(
+        Course $course,
+        BillingClient $billingClient,
+        UserBillingService $userBillingService
+    ): Response {
+        $courseBilling = $billingClient->post('/api/v1/courses/' . $course->getSymbolCode());
+
         return $this->render('course/show.html.twig', [
             'course' => $course,
+            'course_billing' => $courseBilling,
             'lessons' => $course->getLessons()->toArray(),
+            'user_info' => $userBillingService->getUserInfo($this->getUser()),
         ]);
     }
 
@@ -82,5 +112,26 @@ final class CourseController extends AbstractController
         }
 
         return $this->redirectToRoute('app_course_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/purchase', name: 'app_course_purchase', methods: ['GET'])]
+    public function coursePurchase(Course $course, BillingClient $billingClient): RedirectResponse
+    {
+        if (!$user = $this->getUser()) {
+            $this->addFlash('error', 'Вы не авторизованы');
+        } else {
+            $billingClient->setHeaders([
+                'Authorization: Bearer ' . $user->getApiToken()
+            ]);
+            $payResult = $billingClient->post('/api/v1/courses/' . $course->getSymbolCode() . '/pay');
+
+            if ($payResult['success']) {
+                $this->addFlash('success', 'Курс успешно оплачен!');
+            } else {
+                $this->addFlash('error', $payResult['message']);
+            }
+        }
+
+        return $this->redirectToRoute('app_course_show', ['id' => $course->getId()]);
     }
 }

@@ -24,5 +24,10 @@
                 <p class="lead my-3">{{ user.balance ?: 0}}</p>
             </div>
         </div>
+        <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+            <div class="px-0">
+                <a class="lead my-3" href="{{ path('app_transactions') }}">История транзакций</a>
+            </div>
+        </div>
     </div>
 {% endblock %}

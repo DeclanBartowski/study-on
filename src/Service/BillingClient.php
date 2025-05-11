@@ -17,7 +17,7 @@ class BillingClient
 
     public function setHeaders(array $headers): void
     {
-        $this->headers = array_merge($headers, $this->headers);
+        $this->headers = array_unique(array_merge($this->headers, $headers));
     }
 
     public function getHeaders(): array
@@ -50,7 +50,6 @@ class BillingClient
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             $this->setHeaders([
                 'Content-Type: application/json',
-                'Content-Length: ' . strlen(json_encode($data)),
             ]);
         }
 
@@ -67,12 +66,20 @@ class BillingClient
 
         // Обработка ошибок
         if ($response === false) {
+            dump($this->getHeaders());
+            dump($endpoint);
+            dump($response);
+            dd($this->getHeaders());
             throw new BillingUnavailableException('Ошибка данных.');
         }
 
-        /*if ($httpCode >= 400 || json_last_error() !== JSON_ERROR_NONE) {
+        if ($httpCode >= 400 || json_last_error() !== JSON_ERROR_NONE) {
+            dump($this->getHeaders());
+            dump($endpoint);
+            dump($data);
+            dd($response);
             throw new BillingUnavailableException('Ошибка подключения к сервису.');
-        }*/
+        }
 
         return json_decode($response, true);
     }
