@@ -11,11 +11,11 @@ use App\Service\TransactionService;
 use App\Service\UserBillingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 #[Route('/courses')]
 final class CourseController extends AbstractController
@@ -48,15 +48,28 @@ final class CourseController extends AbstractController
 
     #[Route('/new', name: 'app_course_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_SUPER_ADMIN')]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, BillingClient $billingClient): Response
     {
         $course = new Course();
         $form = $this->createForm(CourseType::class, $course);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($course);
-            $entityManager->flush();
+            $entityManager->wrapInTransaction(function () use ($entityManager, $form, $billingClient, $course) {
+                $formData = $form->getData();
+                $billingData = [
+                    'name' => $formData->getName(),
+                    'type' => $formData->getType(),
+                    'price' => $formData->getPrice(),
+                    'code' => $formData->getSymbolCode(),
+                ];
+                $result = $billingClient->post('/api/v1/courses/new', $billingData);
+
+                if ($result['success']) {
+                    $entityManager->persist($course);
+                    $entityManager->flush();
+                }
+            });
 
             return $this->redirectToRoute('app_course_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -85,13 +98,28 @@ final class CourseController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_course_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_SUPER_ADMIN')]
-    public function edit(Request $request, Course $course, EntityManagerInterface $entityManager): Response
-    {
+    public function edit(
+        Request $request,
+        Course $course,
+        EntityManagerInterface $entityManager,
+        BillingClient $billingClient
+    ): Response {
         $form = $this->createForm(CourseType::class, $course);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $entityManager->wrapInTransaction(function () use ($entityManager, $form, $billingClient, $course) {
+                $formData = $form->getData();
+                $billingData = [
+                    'name' => $formData->getName(),
+                    'type' => $formData->getType(),
+                    'price' => $formData->getPrice(),
+                ];
+                $result = $billingClient->post('/api/v1/courses/' . $course->getSymbolCode() . '/edit', $billingData);
+                if ($result['success']) {
+                    $entityManager->flush();
+                }
+            });
 
             return $this->redirectToRoute('app_course_index', [], Response::HTTP_SEE_OTHER);
         }

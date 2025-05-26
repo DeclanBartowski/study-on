@@ -5,7 +5,9 @@ namespace App\Form;
 use App\Entity\Course;
 use App\Form\DataTransformer\TextTranslitTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,6 +30,18 @@ class CourseType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Название курса',
             ])
+            ->add('price', NumberType::class, [
+                'label' => 'Стоимость курса',
+            ])
+            ->add('type', ChoiceType::class, [
+                'label' => 'Тип курса',
+                'choices' => [
+                    'Платный' => Course::TYPE_FULL,
+                    'Аренда' => Course::TYPE_RENT,
+                    'Бесплатный' => Course::TYPE_FREE,
+                ],
+                'data' => Course::TYPE_FULL,
+            ])
             ->add('description', TextareaType::class, [
                 'label' => 'Описание курса',
             ])
@@ -35,9 +49,10 @@ class CourseType extends AbstractType
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
-
-            $transliteratedName = $this->transformer->transform($data->getName());
-            $data->setSymbolCode($transliteratedName);
+            if (empty($data->getSymbolCode())) {
+                $transliteratedName = mb_strtolower($this->transformer->transform($data->getName()));
+                $data->setSymbolCode($transliteratedName);
+            }
 
             $event->setData($data);
         });

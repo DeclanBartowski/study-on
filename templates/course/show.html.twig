@@ -17,7 +17,7 @@
         <p class="h1">{{ course.name }}</p>
         <p class="lead">{{ course.description }}</p>
         {% if app.user %}
-            {% if course_billing.price and user_info.balance >= course_billing.price %}
+            {% if course_billing.price ?? false and user_info.balance >= course_billing.price %}
                 {% if course_billing.type == 2 %}
                     <a
                             class="btn btn-success"

@@ -23,13 +23,19 @@ class Course
     private ?int $id = null;
 
     #[ORM\Column(type: "string", length: 255, unique: true)]
-    private ?string $symbolCode;
+    private ?string $symbolCode = null;
+
+    #[ORM\Column(type: 'smallint')]
+    private int $type;
+
+    #[ORM\Column(type: 'float')]
+    private float $price;
 
     #[ORM\Column(type: "string", length: 255)]
     #[Assert\NotBlank(message: 'Название урока не может быть пустым.')]
     #[Assert\Length(
         min: 3,
-        max: 20,
+        max: 50,
         minMessage: 'Название курса должно содержать минимум {{ limit }} символа.',
         maxMessage: 'Название курса не может быть длиннее {{ limit }} символов.'
     )]
@@ -114,5 +120,37 @@ class Course
         }
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function setType(int $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param float $price
+     */
+    public function setPrice(float $price): void
+    {
+        $this->price = $price;
     }
 }
