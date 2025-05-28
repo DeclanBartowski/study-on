@@ -30,20 +30,21 @@ jobs:
       - name: Start Docker services
         run: |
           mkdir -p ~/.yarn
-          chmod -R 777 ~/.yarn  # Добавляем права на запись
-          docker network create study-billing_default
-          sleep 15  # Даем время сервисам запуститься
+          docker network create study-billing_default || true
           docker-compose up -d --build postgres php nginx
-          # Запускаем node отдельно с нужной командой
-          docker-compose run -d --name study-on-node -u root -e YARN_CACHE_FOLDER=/app/.yarn-cache node tail -f /dev/null
-          sleep 15  # Даем время сервисам запуститься
+          docker-compose run -d --name study-on-node node
+          sleep 15
 
       - name: Install Node dependencies
         run: |
-          docker-compose exec -T -u root node mkdir -p /app/.yarn-cache
-          docker-compose exec -T -u root node chown -R node:node /app/.yarn-cache
-          docker-compose exec -T -u node node yarn install --cache-folder /app/.yarn-cache
-          docker-compose exec -T -u node node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev --cache-folder /app/.yarn-cache
+          # Устанавливаем зависимости от имени root
+          docker-compose exec -T node yarn install --cache-folder /app/.yarn-cache --network-timeout 1000000
+          docker-compose exec -T node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev --cache-folder /app/.yarn-cache
+          
+          # Меняем владельца файлов на стандартного пользователя (UID 1000)
+          docker-compose exec -T node chown -R 1000:1000 /app/node_modules /app/.yarn-cache
+          
+          # Запускаем encore от имени пользователя node
           docker-compose exec -T -u node node yarn encore dev
 
       - name: Fix permissions

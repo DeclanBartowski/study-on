@@ -9,7 +9,8 @@
 /vendor/
 /.yarn/
 ###< symfony/framework-bundle ###
-
+/node_modules/
+/.yarn-cache/
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
