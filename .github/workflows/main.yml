@@ -24,8 +24,10 @@ jobs:
 
       - name: Setting Docker
         run: |
-          sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin
-          mkdir -p ~/.yarn
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.27.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+          mkdir ~/.yarn
           docker network create study-billing_default || true
           docker-compose build
           docker-compose up -d nginx php postgres node
