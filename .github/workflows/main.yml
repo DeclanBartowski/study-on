@@ -44,7 +44,7 @@ jobs:
           docker-compose exec -T -u root node chown -R node:node /app/.yarn-cache
           docker-compose exec -T -u node node yarn install --cache-folder /app/.yarn-cache
           docker-compose exec -T -u node node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev --cache-folder /app/.yarn-cache
-          docker-compose exec -T -u node node yarn encore dev --cache-folder /app/.yarn-cache
+          docker-compose exec -T -u node node yarn encore dev
 
       - name: Fix permissions
         run: |
