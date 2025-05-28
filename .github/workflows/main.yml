@@ -30,8 +30,9 @@ jobs:
       - name: Start Docker services
         run: |
           mkdir -p ~/.yarn
-          docker network create study-billing_default
-          docker-compose up -d --build postgres php nginx node
+          docker-compose up -d --build postgres php nginx
+          # Запускаем node отдельно с нужной командой
+          docker-compose run -d --name study-on-node node tail -f /dev/null
           sleep 10  # Даем время сервисам запуститься
 
       - name: Install Node dependencies

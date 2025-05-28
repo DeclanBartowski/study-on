@@ -43,6 +43,9 @@ services:
     volumes:
       - ${PWD}:/app
       - ${HOME}/.yarn:/yarn
+    tty: true  # Это удерживает контейнер активным
+    stdin_open: true  # Дополнительная опция для интерактивности
+    command: tail -f /dev/null  # Команда, которая будет работать вечно
 networks:
   default:
     external:
