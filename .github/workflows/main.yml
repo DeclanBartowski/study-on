@@ -30,6 +30,7 @@ jobs:
       - name: Start Docker services
         run: |
           mkdir -p ~/.yarn
+          docker network create study-billing_default
           docker-compose up -d --build postgres php nginx node
           sleep 10  # Даем время сервисам запуститься
 
