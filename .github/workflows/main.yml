@@ -30,18 +30,21 @@ jobs:
       - name: Start Docker services
         run: |
           mkdir -p ~/.yarn
+          chmod -R 777 ~/.yarn  # Добавляем права на запись
           docker network create study-billing_default
           sleep 15  # Даем время сервисам запуститься
           docker-compose up -d --build postgres php nginx
           # Запускаем node отдельно с нужной командой
-          docker-compose run -d --name study-on-node node tail -f /dev/null
+          docker-compose run -d --name study-on-node -u root -e YARN_CACHE_FOLDER=/app/.yarn-cache node tail -f /dev/null
           sleep 15  # Даем время сервисам запуститься
 
       - name: Install Node dependencies
         run: |
-          docker-compose exec -T node yarn install
-          docker-compose exec -T node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev
-          docker-compose exec -T node yarn encore dev
+          docker-compose exec -T -u root node mkdir -p /app/.yarn-cache
+          docker-compose exec -T -u root node chown -R node:node /app/.yarn-cache
+          docker-compose exec -T -u node node yarn install --cache-folder /app/.yarn-cache
+          docker-compose exec -T -u node node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev --cache-folder /app/.yarn-cache
+          docker-compose exec -T -u node node yarn encore dev --cache-folder /app/.yarn-cache
 
       - name: Fix permissions
         run: |
