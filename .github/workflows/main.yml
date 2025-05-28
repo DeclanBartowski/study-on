@@ -13,7 +13,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4.5'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql  # Исправлено на pdo_pgsql
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
           coverage: pcov
           tools: composer
 
@@ -22,26 +22,27 @@ jobs:
           echo "DATABASE_URL=pgsql://pguser:pguser@postgres:5432/study_on" >> .env.local
           composer install
 
-      - name: Setting Docker
+      - name: Install Docker Compose
         run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.27.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
-          mkdir ~/.yarn
-          docker network create study-billing_default || true
-          docker-compose build
-          docker-compose up -d nginx php postgres node
 
-          # Установка Yarn зависимостей
-          docker-compose exec -T --user root node bash -c "npm install -g yarn"
-          docker-compose exec -T --user root node bash -c "yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev"
-          docker-compose exec -T --user root node yarn install
-          docker-compose exec -T --user root node yarn encore dev
+      - name: Start Docker services
+        run: |
+          mkdir -p ~/.yarn
+          docker-compose up -d --build postgres php nginx node
+          sleep 10  # Даем время сервисам запуститься
+
+      - name: Install Node dependencies
+        run: |
+          docker-compose exec -T node yarn install
+          docker-compose exec -T node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev
+          docker-compose exec -T node yarn encore dev
 
       - name: Fix permissions
         run: |
-          docker-compose exec -T --user root php bash -c "chown www-data:www-data /app/bin/console && chmod 755 /app/bin/console"
-          docker-compose exec -T --user root php bash -c "chmod +x /app/bin/phpunit && chown www-data:www-data /app/bin/phpunit"
+          docker-compose exec -T php bash -c "chown www-data:www-data /app/bin/console && chmod 755 /app/bin/console"
+          docker-compose exec -T php bash -c "chmod +x /app/bin/phpunit && chown www-data:www-data /app/bin/phpunit"
 
       - name: Clear cache
         run: |
@@ -50,10 +51,10 @@ jobs:
       - name: Setting test environment and DB
         run: |
           echo "DATABASE_URL=pgsql://pguser:pguser@postgres:5432/study_on_test" >> .env.test.local
-          docker-compose exec -T --user www-data php bin/console doctrine:database:drop --force --env=test || true
-          docker-compose exec -T --user www-data php bin/console doctrine:database:create --env=test
-          docker-compose exec -T --user www-data php bin/console doctrine:migrations:migrate -n --env=test
-          docker-compose exec -T --user www-data php bin/console doctrine:fixtures:load -n --env=test
+          docker-compose exec -T php bin/console doctrine:database:drop --force --env=test || true
+          docker-compose exec -T php bin/console doctrine:database:create --env=test
+          docker-compose exec -T php bin/console doctrine:migrations:migrate -n --env=test
+          docker-compose exec -T php bin/console doctrine:fixtures:load -n --env=test
 
       - name: Run PHPUnit
         run: |
