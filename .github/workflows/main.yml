@@ -22,7 +22,6 @@ jobs:
       - name: Setting environment and composer
         run: |
           echo "DATABASE_URL=pgsql://pguser:pguser@postgres:5432/study_on" >> .env.local
-          echo "DATABASE_URL=pgsql://pguser:pguser@postgres:5432/study_on" >> .env.test.local
           composer install
       - name: Setting Docker
         run: |
