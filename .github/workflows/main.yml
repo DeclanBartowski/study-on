@@ -39,7 +39,7 @@ jobs:
         run: |
           # Устанавливаем зависимости от имени root
           docker-compose exec -T node yarn install --cache-folder /app/.yarn-cache --network-timeout 1000000
-          docker-compose exec -T node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev --cache-folder /app/.yarn-cache
+          docker-compose exec -T -u node node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev --cache-folder /app/.yarn-cache
           
           # Меняем владельца файлов на стандартного пользователя (UID 1000)
           docker-compose exec -T node chown -R 1000:1000 /app/node_modules /app/.yarn-cache
