@@ -16,6 +16,8 @@ class CourseFixtures extends Fixture
                 'name' => 'Фулстек-разработчик',
                 'description' => 'Освоите полный цикл создания сайтов и веб‑приложений — с нуля за 16 месяцев. Будете много практиковаться и получите реальный опыт.',
                 'symbolCode' => 'fullstack_developer',
+                'type' => Course::TYPE_FULL,
+                'price' => 10000,
                 'lessons' => [
                     [
                         'name' => 'Первый код',
@@ -38,6 +40,8 @@ class CourseFixtures extends Fixture
                 'name' => 'Инженер по тестированию',
                 'description' => 'Станьте тестировщиком за 5 месяцев с нуля. Будете много практиковаться и получите реальный опыт.',
                 'symbolCode' => 'qa-engineer',
+                'type' => Course::TYPE_FULL,
+                'price' => 20000,
                 'lessons' => [
                     [
                         'name' => 'Роль тестировщика в IT‑команде',
@@ -60,6 +64,8 @@ class CourseFixtures extends Fixture
                 'name' => 'React-разработчик',
                 'description' => 'Тем, кто знаком с основами JS, CSS, HTML и умеет работать с Git и NPM. Если вы не уверены, что справитесь с курсом, попробуйте пройти бесплатный тест из задач по вёрстке и JavaScript.',
                 'symbolCode' => 'react-developer',
+                'type' => Course::TYPE_RENT,
+                'price' => 10000,
                 'lessons' => [
                     [
                         'name' => 'Как всё устроено',
@@ -85,6 +91,8 @@ class CourseFixtures extends Fixture
             $course->setSymbolCode($courseItem['symbolCode']);
             $course->setName($courseItem['name']);
             $course->setDescription($courseItem['description']);
+            $course->setPrice($courseItem['price']);
+            $course->setType($courseItem['type']);
             $manager->persist($course);
             $manager->flush();
             foreach ($courseItem['lessons'] as $lessonItem) {

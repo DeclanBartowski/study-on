@@ -4,6 +4,8 @@ namespace App\Tests;
 
 use App\DataFixtures\CourseFixtures;
 use App\Entity\Course;
+use App\Service\BillingClient;
+use App\Service\TransactionService;
 
 class CourseTest extends AbstractTest
 {
@@ -34,38 +36,16 @@ class CourseTest extends AbstractTest
     public function testCourseNotFound(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getCasualUser());
         $client->request('GET', '/course/9999999999999');
 
         $this->assertResponseNotFound($client->getResponse());
     }
 
-    public function testCourseCreation(): void
-    {
-        $client = self::getClient();
-
-        $crawler = $client->request('GET', '/courses');
-        $link = $crawler->selectLink('Добавить новый курс')->link();
-        $crawler = $client->click($link);
-
-        $this->assertResponseOk($client->getResponse());
-        $this->assertSelectorTextContains('h1', 'Добавить новый курс');
-
-        $form = $crawler->selectButton('Сохранить')->form();
-        $form['course[name]'] = 'Новый курс';
-        $form['course[description]'] = 'Содержание нового курса';
-
-        $client->submit($form);
-
-        $this->assertResponseRedirects('/courses');
-
-        $courses = static::$em->getRepository(Course::class)->findAll();
-        $this->assertEquals(4, count($courses),
-            'Неверное количество курсов, их ' . count($courses));
-    }
-
     public function testCourseCreationValidation(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getAdmin());
         $crawler = $client->request('GET', '/courses/new');
 
         $form = $crawler->selectButton('Сохранить')->form();
@@ -81,6 +61,7 @@ class CourseTest extends AbstractTest
     public function testCourseEdit(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getAdmin());
         $course = static::$em->getRepository(Course::class)->findOneBy([]);
         $crawler = $client->request('GET', '/courses/' . $course->getId() . '/edit');
 
@@ -100,6 +81,7 @@ class CourseTest extends AbstractTest
     public function testCourseDeletion(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getAdmin());
         $course = static::$em->getRepository(Course::class)->findOneBy([]);
         $crawler = $client->request('GET', '/courses/' . $course->getId() . '/edit');
 

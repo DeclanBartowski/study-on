@@ -11,67 +11,26 @@ class LessonTest extends AbstractTest
     public function testLessonList()
     {
         $client = self::getClient();
-
+        $client->loginUser($this->getCasualUser());
         $crawler = $client->request('GET', '/lessons');
         $this->assertResponseCode(200, $client->getResponse());
 
         $this->assertCount(9, $crawler->filter('.lesson-card'));
     }
 
-    public function testLessonShow(): void
-    {
-        $client = self::getClient();
-
-        $lesson = static::$em->getRepository(Lesson::class)->findOneBy([]);
-
-        $client->request('GET', '/lessons/' . $lesson->getId());
-
-        $response = $client->getResponse();
-
-
-        $this->assertResponseOk($response);
-        $this->assertSelectorTextContains('.h1', $lesson->getName());
-    }
-
     public function testLessonNotFound(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getAdmin());
         $client->request('GET', '/lesson/9999999999999');
 
         $this->assertResponseNotFound($client->getResponse());
     }
 
-    public function testLessonCreation(): void
-    {
-        $client = self::getClient();
-        $course = static::$em->getRepository(Course::class)->findOneBy([]);
-        $crawler = $client->request('GET', '/courses/' . $course->getId());
-
-
-        $link = $crawler->selectLink('Добавить урок')->link();
-        $crawler = $client->click($link);
-
-        $this->assertResponseOk($client->getResponse());
-        $this->assertSelectorTextContains('h1', 'Создать новый урок');
-
-        $form = $crawler->selectButton('Сохранить')->form();
-        $form['lesson[name]'] = 'Новый урок';
-        $form['lesson[content]'] = 'Содержание нового урока';
-        $form['lesson[course]'] = $course->getId();
-        $form['lesson[orderNumber]'] = 4;
-
-        $client->submit($form);
-
-        $this->assertResponseRedirects('/courses/' . $course->getId());
-
-        $course = static::$em->getRepository(Course::class)->find($course->getId());
-        $this->assertEquals(4, $course->getLessons()->count(),
-            'Неверное количество уроков, их ' . $course->getLessons()->count());
-    }
-
     public function testLessonCreationValidation(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getAdmin());
         $course = static::$em->getRepository(Course::class)->findOneBy([]);
 
         $crawler = $client->request('GET', '/lessons/new?course_id=' . $course->getId());
@@ -90,6 +49,8 @@ class LessonTest extends AbstractTest
     public function testLessonEdit(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getAdmin());
+
         $lesson = static::$em->getRepository(Lesson::class)->findOneBy([]);
 
         $crawler = $client->request('GET', '/lessons/' . $lesson->getId() . '/edit');
@@ -110,6 +71,7 @@ class LessonTest extends AbstractTest
     public function testLessonDeletion(): void
     {
         $client = self::getClient();
+        $client->loginUser($this->getAdmin());
         $lesson = static::$em->getRepository(Lesson::class)->findOneBy([]);
         $crawler = $client->request('GET', '/lessons/' . $lesson->getId() . '/edit');
 

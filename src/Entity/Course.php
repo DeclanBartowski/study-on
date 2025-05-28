@@ -25,11 +25,11 @@ class Course
     #[ORM\Column(type: "string", length: 255, unique: true)]
     private ?string $symbolCode = null;
 
-    #[ORM\Column(type: 'smallint')]
-    private int $type;
+    #[ORM\Column(type: 'smallint', options: ['default' => self::TYPE_FREE])]
+    private int $type = self::TYPE_FREE;
 
     #[ORM\Column(type: 'float')]
-    private float $price;
+    private float $price = 0;
 
     #[ORM\Column(type: "string", length: 255)]
     #[Assert\NotBlank(message: 'Название урока не может быть пустым.')]

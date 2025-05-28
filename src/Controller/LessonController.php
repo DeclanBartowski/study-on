@@ -61,16 +61,15 @@ final class LessonController extends AbstractController
             $coursePay = $transactionService->isCoursePay($lesson->getCourse());
             if ($coursePay) {
                 $courseBuyed = $transactionService->isCourseBuyed($lesson->getCourse(), $transactions);
-                if (!$courseBuyed) {
-                    throw new AccessDeniedException();
+                if ($courseBuyed) {
+                    return $this->render('lesson/show.html.twig', [
+                        'lesson' => $lesson,
+                        'course' => $lesson->getCourse(),
+                    ]);
                 }
             }
         }
-
-        return $this->render('lesson/show.html.twig', [
-            'lesson' => $lesson,
-            'course' => $lesson->getCourse(),
-        ]);
+        throw new AccessDeniedException();
     }
 
     #[Route('/{id}/edit', name: 'app_lesson_edit', methods: ['GET', 'POST'])]

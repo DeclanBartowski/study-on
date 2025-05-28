@@ -40,7 +40,7 @@ class TransactionService
 
     public function isCoursePay(Course $course): bool
     {
-        $courseBilling = $this->billingClient->post('/api/v1/courses/' . $course->getSymbolCode());
+        $courseBilling = $this->billingClient->get('/api/v1/courses/' . $course->getSymbolCode());
 
         if ($courseBilling['type'] == Course::TYPE_FULL) {
             return true;

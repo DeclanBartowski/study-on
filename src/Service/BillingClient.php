@@ -66,18 +66,10 @@ class BillingClient
 
         // Обработка ошибок
         if ($response === false) {
-            dump($this->getHeaders());
-            dump($endpoint);
-            dump($response);
-            dd($this->getHeaders());
             throw new BillingUnavailableException('Ошибка данных.');
         }
 
         if ($httpCode >= 400 || json_last_error() !== JSON_ERROR_NONE) {
-            dump($this->getHeaders());
-            dump($endpoint);
-            dump($data);
-            dd($response);
             throw new BillingUnavailableException('Ошибка подключения к сервису.');
         }
 

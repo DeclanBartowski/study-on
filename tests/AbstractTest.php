@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
+use App\Security\User;
+use App\Tests\Mock\BillingClientMock;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
@@ -199,5 +201,62 @@ abstract class AbstractTest extends WebTestCase
     private function makeErrorOneLine(string $text): string
     {
         return preg_replace('#[\n\r]+#', ' ', $text);
+    }
+
+
+    protected function getCasualUser()
+    {
+        $client = self::getClient();
+        $client->disableReboot();
+        $client->getContainer()->set(
+            'App\Service\BillingClient',
+            new BillingClientMock('')
+        );
+
+        $client->request('GET', '/login');
+
+        $billingClientMock = $client->getContainer()->get('App\Service\BillingClient');
+
+        $response = $billingClientMock->login([
+            'email' => 'test@example.com',
+            'password' => 'password123',
+        ]);
+
+        $this->assertArrayHasKey('token', $response);
+
+        $user = new User();
+        $user->setEmail('test@example.com');
+        $user->setRoles($response['roles']);
+        $user->setApiToken($response['token']);
+
+        return $user;
+    }
+
+    protected function getAdmin()
+    {
+        $client = self::getClient();
+        $client->disableReboot();
+        $client->getContainer()->set(
+            'App\Service\BillingClient',
+            new BillingClientMock('')
+        );
+
+        $client->request('GET', '/login');
+
+        $billingClientMock = $client->getContainer()->get('App\Service\BillingClient');
+
+        $response = $billingClientMock->login([
+            'email' => 'admin@example.com',
+            'password' => 'admin123',
+        ]);
+
+        $this->assertArrayHasKey('token', $response);
+
+        $user = new User();
+        $user->setEmail('admin@example.com');
+        $user->setRoles($response['roles']);
+        $user->setApiToken($response['token']);
+
+        return $user;
     }
 }

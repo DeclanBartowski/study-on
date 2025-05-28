@@ -86,7 +86,7 @@ final class CourseController extends AbstractController
         BillingClient $billingClient,
         UserBillingService $userBillingService
     ): Response {
-        $courseBilling = $billingClient->post('/api/v1/courses/' . $course->getSymbolCode());
+        $courseBilling = $billingClient->get('/api/v1/courses/' . $course->getSymbolCode());
 
         return $this->render('course/show.html.twig', [
             'course' => $course,
