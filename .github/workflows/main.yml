@@ -37,12 +37,16 @@ jobs:
 
       - name: Install Node dependencies
         run: |
+          docker-compose exec -T -u root node mkdir -p /app/node_modules
+          docker-compose exec -T -u root node chown -R node:node /app/node_modules
           # Устанавливаем зависимости с кешем в /tmp
           docker-compose exec -T node sh -c "yarn config set cache-folder /tmp/yarn-cache"
+          
           #docker-compose exec -T node npm install @symfony/stimulus-bundle @hotwired/stimulus --save-dev
+          
           docker-compose exec -T node yarn install
           docker-compose exec -T node yarn encore dev
-
+          docker-compose exec -T -u root node chown -R node:node /app/node_modules
       - name: Fix permissions
         run: |
           docker-compose exec -T php bash -c "chown www-data:www-data /app/bin/console && chmod 755 /app/bin/console"
