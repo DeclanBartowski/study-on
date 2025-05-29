@@ -51,11 +51,6 @@ jobs:
           
           # Сборка ассетов
           docker-compose exec -T -u node node yarn encore dev
-      - name: Fix permissions
-        run: |
-          docker-compose exec -T php bash -c "chown www-data:www-data /app/bin/console && chmod 755 /app/bin/console"
-          docker-compose exec -T php bash -c "chmod +x /app/bin/phpunit && chown www-data:www-data /app/bin/phpunit"
-
       - name: Clear cache
         run: |
           docker-compose exec -T php bin/console cache:clear --env=test
