@@ -44,12 +44,7 @@ jobs:
           chown -R node:node /app/node_modules /app/yarn.lock /app/package.json
           "
           
-          # Явно устанавливаем stimulus-bundle
-          docker-compose exec -T -u node node sh -c "
-          yarn config set network-timeout 600000 -g &&
-          yarn add @symfony/stimulus-bundle@^3.0 @hotwired/stimulus@^3.0 --dev &&
-          yarn install --production=false --frozen-lockfile
-          "
+          docker-compose run -u root node yarn install
           
           # Сборка ассетов
           docker-compose exec -T -u node node yarn encore dev
