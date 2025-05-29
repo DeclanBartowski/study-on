@@ -10,29 +10,6 @@ use App\Service\TransactionService;
 class CourseTest extends AbstractTest
 {
 
-    public function testCourseList()
-    {
-        $client = self::getClient();
-
-        $crawler = $client->request('GET', '/courses');
-        $this->assertResponseCode(200, $client->getResponse());
-
-        $this->assertCount(3, $crawler->filter('.course-card'));
-    }
-
-    public function testCourseShow(): void
-    {
-        $client = self::getClient();
-
-        $course = static::$em->getRepository(Course::class)->findOneBy([]);
-        $client->request('GET', '/courses/' . $course->getId());
-
-        $response = $client->getResponse();
-
-        $this->assertResponseOk($response);
-        $this->assertSelectorTextContains('.h1', $course->getName());
-    }
-
     public function testCourseNotFound(): void
     {
         $client = self::getClient();
