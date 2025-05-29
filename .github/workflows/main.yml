@@ -31,21 +31,15 @@ jobs:
         run: |
           mkdir -p ~/.yarn
           docker network create study-billing_default || true
-          docker-compose up -d --build postgres php nginx
-          docker-compose run -d --name study-on-node node
+          docker-compose build
+          docker-compose up -d
           sleep 15
 
       - name: Install Node dependencies
         run: |
-          # Устанавливаем зависимости от имени root
-          docker-compose exec -T node yarn install --cache-folder /app/.yarn-cache --network-timeout 1000000
-          docker-compose exec -T -u node node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev --cache-folder /app/.yarn-cache
-          
-          # Меняем владельца файлов на стандартного пользователя (UID 1000)
-          docker-compose exec -T node chown -R 1000:1000 /app/node_modules /app/.yarn-cache
-          
-          # Запускаем encore от имени пользователя node
-          docker-compose exec -T -u node node yarn encore dev
+          docker-compose run -u root node yarn install
+          docker-compose run -u root node yarn encore dev
+          docker ps -a
 
       - name: Fix permissions
         run: |
