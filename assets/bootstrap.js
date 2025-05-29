@@ -1,5 +1,18 @@
-import { startStimulusApp } from '@symfony/stimulus-bundle';
+import { Application } from '@hotwired/stimulus';
 
-const app = startStimulusApp();
-// register any custom, 3rd party controllers here
-// app.register('some_controller_name', SomeImportedController);
+const app = Application.start();
+
+// Автоподгрузка контроллеров
+const context = require.context(
+    '../controllers',
+    true,
+    /\.(j|t)s$/
+);
+
+context.keys().forEach(key => {
+    const module = context(key);
+    const name = key.replace(/^\.\//, '')
+        .replace(/\.(j|t)s$/, '')
+        .replace(/\//g, '--');
+    app.register(name, module.default);
+});
