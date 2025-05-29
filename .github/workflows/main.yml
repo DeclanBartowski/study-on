@@ -44,7 +44,8 @@ jobs:
           chown -R node:node /app/node_modules /app/yarn.lock /app/package.json /app/public /app/package-lock.json
           "
           
-          docker-compose exec node npm install 
+          docker-compose exec node npm install
+          docker-compose exec node npm install @symfony/stimulus-bridge @hotwired/stimulus --save-dev
           docker-compose run -u root node yarn install 
           
           # Сборка ассетов
