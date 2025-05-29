@@ -37,26 +37,22 @@ jobs:
 
       - name: Install Node dependencies
         run: |
-          # Устанавливаем правильные права на ключевые файлы и папки
+          # Устанавливаем права на ключевые файлы
           docker-compose exec -T -u root node sh -c "
           mkdir -p /app/node_modules &&
           touch /app/yarn.lock &&
-          chown -R node:node /app
+          chown -R node:node /app/node_modules /app/yarn.lock /app/package.json
           "
           
-          # Устанавливаем зависимости
+          # Явно устанавливаем stimulus-bundle
           docker-compose exec -T -u node node sh -c "
-          yarn config set cache-folder /tmp/yarn-cache &&
-          yarn config set cache-folder /tmp/yarn-cache &&
-          yarn install --network-timeout 1000000 --production=false &&
-          yarn encore dev
+          yarn config set network-timeout 600000 -g &&
+          yarn add @symfony/stimulus-bundle@^3.0 @hotwired/stimulus@^3.0 --dev &&
+          yarn install --production=false --frozen-lockfile
           "
-          docker-compose exec -T node npm install @symfony/stimulus-bundle @hotwired/stimulus
           
-          # Фикс прав (на всякий случай)
-          docker-compose exec -T -u root node sh -c "
-          chown -R node:node /app/node_modules /app/yarn.lock
-          "
+          # Сборка ассетов
+          docker-compose exec -T -u node node yarn encore dev
       - name: Fix permissions
         run: |
           docker-compose exec -T php bash -c "chown www-data:www-data /app/bin/console && chmod 755 /app/bin/console"
