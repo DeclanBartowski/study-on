@@ -4,7 +4,7 @@ const app = Application.start();
 
 // Автоподгрузка контроллеров
 const context = require.context(
-    '../controllers',
+    'controllers',
     true,
     /\.(j|t)s$/
 );
