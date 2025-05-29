@@ -37,16 +37,25 @@ jobs:
 
       - name: Install Node dependencies
         run: |
-          docker-compose exec -T -u root node mkdir -p /app/node_modules
-          docker-compose exec -T -u root node chown -R node:node /app/node_modules
-          # Устанавливаем зависимости с кешем в /tmp
-          docker-compose exec -T node sh -c "yarn config set cache-folder /tmp/yarn-cache"
+          # Устанавливаем правильные права на ключевые файлы и папки
+          docker-compose exec -T -u root node sh -c "
+          mkdir -p /app/node_modules &&
+          touch /app/yarn.lock &&
+          chown -R node:node /app/node_modules /app/yarn.lock /app/package.json
+          "
           
-          #docker-compose exec -T node npm install @symfony/stimulus-bundle @hotwired/stimulus --save-dev
+          # Устанавливаем зависимости
+          docker-compose exec -T -u node node sh -c "
+          yarn config set cache-folder /tmp/yarn-cache &&
+          yarn config set cache-folder /tmp/yarn-cache &&
+          yarn install --network-timeout 1000000 --production=false &&
+          yarn encore dev
+          "
           
-          docker-compose exec -T node yarn install
-          docker-compose exec -T node yarn encore dev
-          docker-compose exec -T -u root node chown -R node:node /app/node_modules
+          # Фикс прав (на всякий случай)
+          docker-compose exec -T -u root node sh -c "
+          chown -R node:node /app/node_modules /app/yarn.lock
+          "
       - name: Fix permissions
         run: |
           docker-compose exec -T php bash -c "chown www-data:www-data /app/bin/console && chmod 755 /app/bin/console"
