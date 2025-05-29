@@ -38,12 +38,11 @@ services:
   node:
     image: node:alpine
     environment:
-      - YARN_CACHE_FOLDER=/home/node/.yarn-cache  # Изменяем путь к кешу
+      - YARN_CACHE_FOLDER=/tmp/yarn-cache  # Используем временную директорию
     working_dir: /app
     user: ${UID:-1000}:${GID:-1000}
     volumes:
       - ${PWD}:/app
-      - yarn_cache:/home/node/.yarn-cache  # Используем volume вместо хостовой папки
     tty: true
     stdin_open: true
     command: tail -f /dev/null

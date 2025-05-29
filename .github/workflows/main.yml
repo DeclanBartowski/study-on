@@ -37,15 +37,11 @@ jobs:
 
       - name: Install Node dependencies
         run: |
-          # Создаем папку для кеша с правильными правами
-          docker-compose exec -T node mkdir -p /home/node/.yarn-cache
-          docker-compose exec -T node chown -R node:node /home/node/.yarn-cache
-          
-          # Устанавливаем зависимости
-          docker-compose exec -T -u node node yarn config set cache-folder /home/node/.yarn-cache
-          docker-compose exec -T -u node node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev
-          docker-compose exec -T -u node node yarn install
-          docker-compose exec -T -u node node yarn encore dev
+          # Устанавливаем зависимости с кешем в /tmp
+          docker-compose exec -T node sh -c "yarn config set cache-folder /tmp/yarn-cache"
+          docker-compose exec -T node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev
+          docker-compose exec -T node yarn install
+          docker-compose exec -T node yarn encore dev
 
       - name: Fix permissions
         run: |
