@@ -37,12 +37,13 @@ services:
   node:
     image: node:alpine
     environment:
-      - YARN_CACHE_FOLDER=/yarn
+      - YARN_CACHE_FOLDER=/home/node/.yarn-cache
     working_dir: /app
     user: ${UID:-1000}:${GID:-1000}
     volumes:
       - ${PWD}:/app
       - ${HOME}/.yarn:/yarn
+      - yarn_cache:/home/node/.yarn-cache
     tty: true  # Это удерживает контейнер активным
     stdin_open: true  # Дополнительная опция для интерактивности
     command: tail -f /dev/null  # Команда, которая будет работать вечно

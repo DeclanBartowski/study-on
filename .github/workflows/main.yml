@@ -37,10 +37,9 @@ jobs:
 
       - name: Install Node dependencies
         run: |
-          docker-compose exec -T -u node node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev
-          docker-compose run -u root node yarn install
-          docker-compose run -u root node yarn encore dev
-          docker ps -a
+          docker-compose exec -T node yarn add @symfony/stimulus-bundle @hotwired/stimulus --dev
+          docker-compose exec -T node yarn install
+          docker-compose exec -T node yarn encore dev
 
       - name: Fix permissions
         run: |
